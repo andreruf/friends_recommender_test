@@ -1,6 +1,6 @@
 import { type CpfValidator, type PersonModel, type LoadPerson } from './load-person-protocols'
 import { InvalidParamError, NotFoundError, ServerError } from '../../errors'
-import { LoadPersonController } from './load-person'
+import { LoadPersonController } from './load-person-controller'
 
 interface SutTypes {
   sut: LoadPersonController
