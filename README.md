@@ -121,6 +121,7 @@ npm run dev
 >Exemplo de entrada
 
 >>http://localhost:3000/recommendations/12345678909
+
 >Exemplo de saída
 >>StatusCode **[200]**
 ``` json
