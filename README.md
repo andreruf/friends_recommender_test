@@ -2,6 +2,10 @@
 
 Projeto de recomendação de amizades.
 
+## Requisitos
+
+>node >=18.0.0
+
 ## Instalação
 
 ```bash 
@@ -39,7 +43,7 @@ npm run dev
 ```
 
 >>StatusCode **[400]**
-``` json
+``` bash
 # caso o CPF já está cadastrado
 "cpf already exists" 
 
@@ -65,7 +69,7 @@ npm run dev
 ```
 
 >>StatusCode **[404]**
-``` typescript
+``` bash
 # CPF não encontado
 "cpf not found"
 ```
@@ -77,7 +81,7 @@ npm run dev
 
 >Exemplo de saída 
 >>StatusCode **[200]**
-``` typescript
+``` bash
 "Database cleaned"
 ```
 ---
@@ -96,17 +100,17 @@ npm run dev
 >Exemplo de saída  
 
 >>StatusCode **[200]**
-``` json
+``` bash
 "Relationship created"
 ```
 >>StatusCode **[400]**
-``` json
+``` bash
 # não consiste em 11 digitos numéricos
 "Invalid param: cpf"
 ```
 
 >>StatusCode **[404]**
-``` typescript
+``` bash
 # CPF não encontado
 "cpf not found"
 
@@ -116,7 +120,7 @@ npm run dev
 
 >Exemplo de entrada
 
-http://localhost:3000/recommendations/12345678909
+>>http://localhost:3000/recommendations/12345678909
 >Exemplo de saída
 >>StatusCode **[200]**
 ``` json
@@ -126,13 +130,13 @@ http://localhost:3000/recommendations/12345678909
 ]
 ```
 >>StatusCode **[400]**
-``` json
+``` bash
 # não consiste em 11 digitos numéricos
 "Invalid param: cpf"
 ```
 
 >>StatusCode **[404]**
-``` json
+``` bash
 # não foi encontrado
 "cpf not found"
 ```
