@@ -1,5 +1,5 @@
 import { LoadRecommendationsController } from '../../../presentation/controllers/recommendations/load-recommendations-controller'
-import { CpfValidatorAdapter } from '../../adapters/validators/cpf-validator-adapter'
+import { CpfValidatorAdapter } from '../../../validation/validators/cpf-validator-adapter'
 import { makeLoadRecommendations } from '../usecases/load-recommendations-factory'
 import { makeLoadPerson } from '../usecases/load-person-factory'
 

@@ -1,8 +1,9 @@
-import { type HttpResponse, type Controller, type CpfValidator } from './load-recommendations-protocols'
+import { type HttpResponse, type Controller } from './load-recommendations-protocols'
 import { InvalidParamError, NotFoundError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { type LoadPerson } from '../../../domain/usecases/load-person'
 import { type LoadRecommendations } from '../../../domain/usecases/load-recommendations'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class LoadRecommendationsController implements Controller {
   constructor (

@@ -1,7 +1,8 @@
-import { type HttpResponse, type HttpRequest, type Controller, type CpfValidator, type CreatePerson, type CreatePersonModel } from './create-person-protocols'
+import { type HttpResponse, type HttpRequest, type Controller, type CreatePerson, type CreatePersonModel } from './create-person-protocols'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { type LoadPerson } from '../../../domain/usecases/load-person'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class CreatePersonController implements Controller {
   constructor (

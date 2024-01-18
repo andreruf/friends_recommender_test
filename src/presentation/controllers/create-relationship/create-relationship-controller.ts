@@ -1,7 +1,8 @@
-import { type HttpResponse, type HttpRequest, type Controller, type CpfValidator, type CreateRelationship, type CreateRelationshipModel } from './create-relationship-protocols'
+import { type HttpResponse, type HttpRequest, type Controller, type CreateRelationship, type CreateRelationshipModel } from './create-relationship-protocols'
 import { MissingParamError, InvalidParamError, NotFoundError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
 import { type LoadPerson } from '../../../domain/usecases/load-person'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class CreateRelationshipController implements Controller {
   constructor (
