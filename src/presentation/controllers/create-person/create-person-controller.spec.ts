@@ -1,6 +1,7 @@
-import { type CpfValidator, type PersonModel, type CreatePerson, type CreatePersonModel, type LoadPerson } from './create-person-protocols'
+import { type PersonModel, type CreatePerson, type CreatePersonModel, type LoadPerson } from './create-person-protocols'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { CreatePersonController } from './create-person-controller'
+import { type CpfValidator } from '../../../validation/protocols'
 
 interface SutTypes {
   sut: CreatePersonController

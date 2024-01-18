@@ -1,7 +1,8 @@
-import { type CpfValidator, type PersonModel, type LoadPerson } from './load-recommendations-protocols'
+import { type PersonModel, type LoadPerson } from './load-recommendations-protocols'
 import { InvalidParamError, NotFoundError, ServerError } from '../../errors'
 import { type LoadRecommendations } from '../../../domain/usecases/load-recommendations'
 import { LoadRecommendationsController } from './load-recommendations-controller'
+import { type CpfValidator } from '../../../validation/protocols'
 
 interface SutTypes {
   sut: LoadRecommendationsController

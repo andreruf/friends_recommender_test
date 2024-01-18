@@ -1,6 +1,7 @@
-import { type CreateRelationship, type CpfValidator, type CreateRelationshipModel, type LoadPerson, type PersonModel } from './create-relationship-protocols'
+import { type CreateRelationship, type CreateRelationshipModel, type LoadPerson, type PersonModel } from './create-relationship-protocols'
 import { InvalidParamError, MissingParamError, NotFoundError, ServerError } from '../../errors'
 import { CreateRelationshipController } from './create-relationship-controller'
+import { type CpfValidator } from '../../../validation/protocols'
 
 interface SutTypes {
   sut: CreateRelationshipController
