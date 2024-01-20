@@ -1,4 +1,4 @@
-import { type CreateRelationship, type CreateRelationshipModel, type LoadPerson, type PersonModel } from './create-relationship-protocols'
+import { type CreateRelationship } from './create-relationship-protocols'
 import { InvalidParamError, MissingParamError, NotFoundError, ServerError } from '../../errors'
 import { CreateRelationshipController } from './create-relationship-controller'
 import { type CpfValidator } from '../../../validation/protocols'
@@ -7,7 +7,6 @@ interface SutTypes {
   sut: CreateRelationshipController
   cpfValidatorStub: CpfValidator
   createRelationshipStub: CreateRelationship
-  loadPersonStub: LoadPerson
 }
 
 const makeCpfValidator = (): CpfValidator => {
@@ -21,7 +20,7 @@ const makeCpfValidator = (): CpfValidator => {
 
 const makeCreateRelationship = (): CreateRelationship => {
   class CreateRelationshipStub implements CreateRelationship {
-    async create (persons: CreateRelationshipModel): Promise<string> {
+    async create (cpf1: string, cpf2: string): Promise<string> {
       const respose = 'Relationship created'
       return await new Promise(resolve => { resolve(respose) })
     }
@@ -29,37 +28,21 @@ const makeCreateRelationship = (): CreateRelationship => {
   return new CreateRelationshipStub()
 }
 
-const makeLoadPerson = (): LoadPerson => {
-  class LoadPersonStub implements LoadPerson {
-    async load (cpf: string): Promise<PersonModel | null> {
-      const fakePerson = {
-        name: 'André',
-        cpf: '12345678912',
-        friends: []
-      }
-      return await new Promise(resolve => { resolve(fakePerson) })
-    }
-  }
-  return new LoadPersonStub()
-}
-
 const makeSut = (): SutTypes => {
   const cpfValidatorStub = makeCpfValidator()
   const createRelationshipStub = makeCreateRelationship()
-  const loadPersonStub = makeLoadPerson()
-  const sut = new CreateRelationshipController(cpfValidatorStub, createRelationshipStub, loadPersonStub)
+  const sut = new CreateRelationshipController(cpfValidatorStub, createRelationshipStub)
   return {
     sut,
     cpfValidatorStub,
-    createRelationshipStub,
-    loadPersonStub
+    createRelationshipStub
   }
 }
 
-describe('Create Person Controller', () => {
+describe('Create Relationship Controller', () => {
   test('Should return 404 if cpfs are not found', async () => {
-    const { sut, loadPersonStub } = makeSut()
-    jest.spyOn(loadPersonStub, 'load').mockImplementationOnce(async () => {
+    const { sut, createRelationshipStub } = makeSut()
+    jest.spyOn(createRelationshipStub, 'create').mockImplementationOnce(async () => {
       return null
     })
     const httpRequest = {
@@ -129,22 +112,6 @@ describe('Create Person Controller', () => {
     expect(httpResponse.body).toEqual(new ServerError().message)
   })
 
-  test('Should return 500 if LoadPerson throws error', async () => {
-    const { sut, loadPersonStub } = makeSut()
-    jest.spyOn(loadPersonStub, 'load').mockImplementationOnce(async () => {
-      return await new Promise((resolve, reject) => { reject(new Error()) })
-    })
-    const httpRequest = {
-      body: {
-        cpf1: '12345678912',
-        cpf2: '12345678922'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError().message)
-  })
-
   test('Should call CpfValidator with correct cpf', async () => {
     const { sut, cpfValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(cpfValidatorStub, 'isValid')
@@ -169,10 +136,7 @@ describe('Create Person Controller', () => {
       }
     }
     await sut.handle(httpRequest)
-    expect(createSpy).toHaveBeenCalledWith({
-      cpf1: '12345678912',
-      cpf2: '12345678922'
-    })
+    expect(createSpy).toHaveBeenCalledWith('12345678912', '12345678922')
   })
 
   test('Should return 200 if valid data is provided', async () => {
