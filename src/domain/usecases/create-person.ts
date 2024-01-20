@@ -6,5 +6,5 @@ export interface CreatePersonModel {
 }
 
 export interface CreatePerson {
-  create: (person: CreatePersonModel) => Promise<PersonModel>
+  create: (person: CreatePersonModel) => Promise<PersonModel | null>
 }

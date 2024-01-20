@@ -2,8 +2,8 @@ import { type CreatePersonRepository, type CreatePersonModel, type PersonModel }
 
 export class InMemoryCreatePersonRepository implements CreatePersonRepository {
   async create (personData: CreatePersonModel): Promise<PersonModel> {
-    const formatedPersonData = Object.assign(personData, { friends: [] })
     const personCollection = global.personCollection || []
+    const formatedPersonData = Object.assign(personData, { id: personCollection.length + 1, friends: [] })
 
     personCollection.push(formatedPersonData)
     global.personCollection = personCollection
