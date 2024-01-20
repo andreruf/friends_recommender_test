@@ -116,7 +116,7 @@ npm run dev
 
 ```
 ---
-### **Get Recommendations - **[GET]** http://localhost:3000/recommendatons/:CPF**
+### **Get Recommendations - **[GET]** http://localhost:3000/recommendations/:CPF**
 
 >Exemplo de entrada
 
