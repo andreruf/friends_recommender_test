@@ -1,4 +1,3 @@
-import { type PersonModel, type LoadPerson } from './load-recommendations-protocols'
 import { InvalidParamError, NotFoundError, ServerError } from '../../errors'
 import { type LoadRecommendations } from '../../../domain/usecases/load-recommendations'
 import { LoadRecommendationsController } from './load-recommendations-controller'
@@ -7,7 +6,6 @@ import { type CpfValidator } from '../../../validation/protocols'
 interface SutTypes {
   sut: LoadRecommendationsController
   cpfValidatorStub: CpfValidator
-  loadPersonStub: LoadPerson
   loadRecommendationsStub: LoadRecommendations
 }
 
@@ -29,29 +27,13 @@ const makeLoadRecommendations = (): LoadRecommendations => {
   return new LoadRecommendationsStub()
 }
 
-const makeLoadPerson = (): LoadPerson => {
-  class LoadPersonStub implements LoadPerson {
-    async load (cpf: string): Promise<PersonModel | null> {
-      const fakePerson = {
-        name: 'André',
-        cpf: '12345678912',
-        friends: []
-      }
-      return await new Promise(resolve => { resolve(fakePerson) })
-    }
-  }
-  return new LoadPersonStub()
-}
-
 const makeSut = (): SutTypes => {
   const cpfValidatorStub = makeCpfValidator()
-  const loadPersonStub = makeLoadPerson()
   const loadRecommendationsStub = makeLoadRecommendations()
-  const sut = new LoadRecommendationsController(cpfValidatorStub, loadRecommendationsStub, loadPersonStub)
+  const sut = new LoadRecommendationsController(cpfValidatorStub, loadRecommendationsStub)
   return {
     sut,
     cpfValidatorStub,
-    loadPersonStub,
     loadRecommendationsStub
   }
 }
@@ -98,24 +80,9 @@ describe('Load Recommendations Controller', () => {
     expect(httpResponse.body).toEqual(new ServerError().message)
   })
 
-  test('Should return 500 if LoadPerson throws error', async () => {
-    const { sut, loadPersonStub } = makeSut()
-    jest.spyOn(loadPersonStub, 'load').mockImplementationOnce(async () => {
-      return await new Promise((resolve, reject) => { reject(new Error()) })
-    })
-    const httpRequest = {
-      params: {
-        cpf: '12345678912'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError().message)
-  })
-
   test('Should return 404 if no person was found', async () => {
-    const { sut, loadPersonStub } = makeSut()
-    jest.spyOn(loadPersonStub, 'load').mockImplementationOnce(async () => {
+    const { sut, loadRecommendationsStub } = makeSut()
+    jest.spyOn(loadRecommendationsStub, 'load').mockImplementationOnce(async () => {
       return null
     })
     const httpRequest = {
@@ -137,18 +104,6 @@ describe('Load Recommendations Controller', () => {
     }
     await sut.handle(httpRequest)
     expect(isValidSpy).toHaveBeenCalledWith('12345678912')
-  })
-
-  test('Should call loadPerson with correct values', async () => {
-    const { sut, loadPersonStub } = makeSut()
-    const createSpy = jest.spyOn(loadPersonStub, 'load')
-    const httpRequest = {
-      params: {
-        cpf: '12345678912'
-      }
-    }
-    await sut.handle(httpRequest)
-    expect(createSpy).toHaveBeenCalledWith('12345678912')
   })
 
   test('Should return 200 if valid data is provided', async () => {
