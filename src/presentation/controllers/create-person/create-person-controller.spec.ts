@@ -1,4 +1,4 @@
-import { type PersonModel, type CreatePerson, type CreatePersonModel, type LoadPerson } from './create-person-protocols'
+import { type PersonModel, type CreatePerson, type CreatePersonModel } from './create-person-protocols'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
 import { CreatePersonController } from './create-person-controller'
 import { type CpfValidator } from '../../../validation/protocols'
@@ -7,7 +7,6 @@ interface SutTypes {
   sut: CreatePersonController
   cpfValidatorStub: CpfValidator
   createPersonStub: CreatePerson
-  loadPersonStub: LoadPerson
 }
 
 const makeCpfValidator = (): CpfValidator => {
@@ -23,6 +22,7 @@ const makeCreatePerson = (): CreatePerson => {
   class CreatePersonStub implements CreatePerson {
     async create (person: CreatePersonModel): Promise<PersonModel> {
       const fakePerson = {
+        id: 1,
         name: 'André',
         cpf: '12345678912',
         friends: []
@@ -33,60 +33,18 @@ const makeCreatePerson = (): CreatePerson => {
   return new CreatePersonStub()
 }
 
-const makeLoadPersonNotFound = (): LoadPerson => {
-  class LoadPersonStub implements LoadPerson {
-    async load (cpf: string): Promise<PersonModel | null> {
-      const fakePerson = null
-      return await new Promise(resolve => { resolve(fakePerson) })
-    }
-  }
-  return new LoadPersonStub()
-}
-
-const makeLoadPersonSuccess = (): LoadPerson => {
-  class LoadPersonStub implements LoadPerson {
-    async load (cpf: string): Promise<PersonModel | null> {
-      const fakePerson = {
-        name: 'André',
-        cpf: '12345678912',
-        friends: []
-      }
-      return await new Promise(resolve => { resolve(fakePerson) })
-    }
-  }
-  return new LoadPersonStub()
-}
-
 const makeSut = (): SutTypes => {
   const cpfValidatorStub = makeCpfValidator()
   const createPersonStub = makeCreatePerson()
-  const loadPersonStub = makeLoadPersonNotFound()
-  const sut = new CreatePersonController(cpfValidatorStub, createPersonStub, loadPersonStub)
+  const sut = new CreatePersonController(cpfValidatorStub, createPersonStub)
   return {
     sut,
     cpfValidatorStub,
-    createPersonStub,
-    loadPersonStub
+    createPersonStub
   }
 }
 
 describe('Create Person Controller', () => {
-  test('Should return 400 if CPF already exists ', async () => {
-    const cpfValidatorStub = makeCpfValidator()
-    const createPersonStub = makeCreatePerson()
-    const loadPersonStub = makeLoadPersonSuccess()
-    const sut = new CreatePersonController(cpfValidatorStub, createPersonStub, loadPersonStub)
-    const httpRequest = {
-      body: {
-        name: 'André',
-        cpf: '12345678912'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new Error('cpf already exists').message)
-  })
-
   test('Should return 400 if CPF lenght is not equal to 11', async () => {
     const { sut, cpfValidatorStub } = makeSut()
     jest.spyOn(cpfValidatorStub, 'isValid').mockReturnValueOnce(false)
@@ -184,6 +142,22 @@ describe('Create Person Controller', () => {
     expect(isValidSpy).toHaveBeenCalledWith('12345678902')
   })
 
+  test('Should return 400 if person already exists', async () => {
+    const { sut, createPersonStub } = makeSut()
+    jest.spyOn(createPersonStub, 'create').mockImplementationOnce(async () => {
+      return await new Promise((resolve, reject) => { resolve(null) })
+    })
+    const httpRequest = {
+      body: {
+        name: 'André',
+        cpf: '111111111111'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual('cpf already exists')
+  })
+
   test('Should call createPerson with correct values', async () => {
     const { sut, createPersonStub } = makeSut()
     const createSpy = jest.spyOn(createPersonStub, 'create')
@@ -211,6 +185,7 @@ describe('Create Person Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual({
+      id: 1,
       name: 'André',
       cpf: '12345678912',
       friends: []
