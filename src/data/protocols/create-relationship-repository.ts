@@ -1,5 +1,5 @@
-import { type CreateRelationshipModel } from '../usecases/create-person/create-person-protocols'
+import { type PersonModel } from '../models'
 
 export interface CreateRelationshipRepository {
-  create: (persons: CreateRelationshipModel) => Promise<string>
+  create: (person1: PersonModel, person2: PersonModel) => Promise<string>
 }
