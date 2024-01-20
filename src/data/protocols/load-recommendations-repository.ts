@@ -1,3 +1,5 @@
+import { type PersonModel } from '../models'
+
 export interface LoadRecommendationsRepository {
-  load: (cpf: string) => Promise<string[]>
+  load: (id: number) => Promise<PersonModel>
 }
