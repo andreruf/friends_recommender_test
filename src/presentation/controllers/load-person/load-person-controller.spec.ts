@@ -1,6 +1,7 @@
-import { type CpfValidator, type PersonModel, type LoadPerson } from './load-person-protocols'
+import { type PersonModel, type LoadPerson } from './load-person-protocols'
 import { InvalidParamError, NotFoundError, ServerError } from '../../errors'
 import { LoadPersonController } from './load-person-controller'
+import { type CpfValidator } from '../../../validation/protocols'
 
 interface SutTypes {
   sut: LoadPersonController
@@ -21,6 +22,7 @@ const makeLoadPerson = (): LoadPerson => {
   class LoadPersonStub implements LoadPerson {
     async load (cpf: string): Promise<PersonModel | null> {
       const fakePerson = {
+        id: 1,
         name: 'André',
         cpf: '12345678912',
         friends: []
@@ -147,6 +149,7 @@ describe('Create Person Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual({
+      id: 1,
       name: 'André',
       cpf: '12345678912',
       friends: []

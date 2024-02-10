@@ -1,19 +1,18 @@
-import { type HttpResponse, type HttpRequest, type Controller, type CpfValidator, type CreatePerson, type CreatePersonModel } from './create-person-protocols'
+import { type HttpResponse, type HttpRequest, type Controller, type CreatePerson, type CreatePersonModel } from './create-person-protocols'
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
-import { type LoadPerson } from '../../../domain/usecases/load-person'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class CreatePersonController implements Controller {
   constructor (
     private readonly cpfValidator: CpfValidator,
-    private readonly createPerson: CreatePerson,
-    private readonly loadPerson: LoadPerson
+    private readonly createPerson: CreatePerson
+
   ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const requiredFields = ['name', 'cpf']
-
       const { cpf, name } = httpRequest.body as CreatePersonModel
 
       for (const field of requiredFields) {
@@ -28,16 +27,14 @@ export class CreatePersonController implements Controller {
         return badRequest(new InvalidParamError('cpf'))
       }
 
-      const personExist = await this.loadPerson.load(cpf)
-
-      if (personExist) {
-        return badRequest(new Error('cpf already exists'))
-      }
-
       const person = await this.createPerson.create({
         name,
         cpf
       })
+
+      if (!person) {
+        return badRequest(new Error('cpf already exists'))
+      }
 
       return ok(person)
     } catch (error) {

@@ -1,14 +1,13 @@
-import { type HttpResponse, type Controller, type CpfValidator } from './load-recommendations-protocols'
+import { type HttpResponse, type Controller } from './load-recommendations-protocols'
 import { InvalidParamError, NotFoundError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
-import { type LoadPerson } from '../../../domain/usecases/load-person'
 import { type LoadRecommendations } from '../../../domain/usecases/load-recommendations'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class LoadRecommendationsController implements Controller {
   constructor (
     private readonly cpfValidator: CpfValidator,
-    private readonly loadRecommendations: LoadRecommendations,
-    private readonly loadPerson: LoadPerson
+    private readonly loadRecommendations: LoadRecommendations
   ) {}
 
   async handle (httpRequest: LoadRecommendationsController.Request): Promise<HttpResponse> {
@@ -21,13 +20,11 @@ export class LoadRecommendationsController implements Controller {
         return badRequest(new InvalidParamError('cpf'))
       }
 
-      const cpfExist = await this.loadPerson.load(cpf)
+      const response = await this.loadRecommendations.load(cpf)
 
-      if (!cpfExist) {
+      if (!response) {
         return notFound(new NotFoundError('cpf'))
       }
-
-      const response = await this.loadRecommendations.load(cpf)
 
       return ok(response)
     } catch (error) {

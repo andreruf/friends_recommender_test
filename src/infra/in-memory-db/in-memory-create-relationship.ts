@@ -1,23 +1,10 @@
-import { type CreateRelationshipRepository, type CreateRelationshipModel } from '../../data/usecases/create-relationship/create-relationship-protocols'
+import { type PersonModel, type CreateRelationshipRepository } from '../../data/usecases/create-relationship/create-relationship-protocols'
 
 export class InMemoryCreateRelationshipRepository implements CreateRelationshipRepository {
-  createRelatioship (personCpf: string, relationshipCpf: string): void {
-    global.personCollection.forEach(function (person) {
-      if (person.cpf === personCpf) {
-        const isFriend = !!(person.friends.find((friendCpf: string) => friendCpf === relationshipCpf))
+  async create (person1: PersonModel, person2: PersonModel): Promise<string> {
+    global.personCollection[person1.id - 1].friends.push({ id: person2.id, cpf: person2.cpf })
+    global.personCollection[person2.id - 1].friends.push({ id: person1.id, cpf: person1.cpf })
 
-        if (!isFriend) {
-          person.friends.push(relationshipCpf)
-        }
-      }
-    })
-  }
-
-  async create (persons: CreateRelationshipModel): Promise<string> {
-    const { cpf1, cpf2 } = persons
-
-    this.createRelatioship(cpf1, cpf2)
-    this.createRelatioship(cpf2, cpf1)
     return 'Relationship created'
   }
 }

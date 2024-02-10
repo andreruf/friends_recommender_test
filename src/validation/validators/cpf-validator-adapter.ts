@@ -1,4 +1,4 @@
-import { type CpfValidator } from '../../../presentation/protocols'
+import { type CpfValidator } from '../protocols'
 
 export class CpfValidatorAdapter implements CpfValidator {
   isValid (cpf: string): boolean {

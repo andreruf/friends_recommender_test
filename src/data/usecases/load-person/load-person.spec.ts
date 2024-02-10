@@ -10,6 +10,7 @@ const makeLoadPersonRepository = (): LoadPersonRepository => {
   class LoadPersonRepositoryStub implements LoadPersonRepository {
     async load (cpf: string): Promise<PersonModel> {
       const fakePerson = {
+        id: 1,
         name: 'André',
         cpf: '12345678912',
         friends: []

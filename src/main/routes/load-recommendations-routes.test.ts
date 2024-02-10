@@ -49,13 +49,6 @@ describe('Load recommendations Routes', () => {
       })
 
     await request(app)
-      .post('/person')
-      .send({
-        name: 'D',
-        cpf: '44444444444'
-      })
-
-    await request(app)
       .post('/relationship')
       .send({
         cpf1: '11111111111',

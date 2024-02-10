@@ -1,13 +1,12 @@
-import { type HttpResponse, type HttpRequest, type Controller, type CpfValidator, type CreateRelationship, type CreateRelationshipModel } from './create-relationship-protocols'
+import { type HttpResponse, type HttpRequest, type Controller, type CreateRelationship, type CreateRelationshipModel } from './create-relationship-protocols'
 import { MissingParamError, InvalidParamError, NotFoundError } from '../../errors'
 import { badRequest, notFound, ok, serverError } from '../../helpers/http-helper'
-import { type LoadPerson } from '../../../domain/usecases/load-person'
+import { type CpfValidator } from '../../../validation/protocols'
 
 export class CreateRelationshipController implements Controller {
   constructor (
     private readonly cpfValidator: CpfValidator,
-    private readonly createRelationship: CreateRelationship,
-    private readonly loadPerson: LoadPerson
+    private readonly createRelationship: CreateRelationship
   ) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -25,16 +24,13 @@ export class CreateRelationshipController implements Controller {
         return badRequest(new InvalidParamError('cpf'))
       }
 
-      const cpf1Exist = await this.loadPerson.load(cpf1)
-      const cpf2Exist = await this.loadPerson.load(cpf2)
+      const response = await this.createRelationship.create(
+        cpf1, cpf2
+      )
 
-      if (!cpf1Exist || !cpf2Exist) {
+      if (!response) {
         return notFound(new NotFoundError('cpf'))
       }
-
-      const response = await this.createRelationship.create({
-        cpf1, cpf2
-      })
 
       return ok(response)
     } catch (error) {
